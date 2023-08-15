@@ -50,7 +50,51 @@ We want to achieve this without the usage of usb keyboard/mouse & external monit
 - get the IP address of the PI (`arp -a | grep raspberry`)
 - log in via SSH to the PI using your credentials `ssh <username>@<ip-adress>`
 - update the packages using the following commands
-  - `sudo apt-get update`
-  - `sudo apt-get upgrade` (Choose `Y` when prompted)
-  - restart your PI using: `sudo shutdown -r now`
+  - `sudo apt update && sudo apt full-upgrade`
+  - restart your PI using: `sudo reboot`
 - Configure your PI to your pleasing using: `sudo raspi-config`
+
+### Set up docker:
+- Install docker: `curl -sSL https://get.docker.com | sh`
+- add our user to root group to ditch sudo for docker compose: `sudo usermod -aG docker ${USER}`
+- enable docker on system: `sudo systemctl enable docker`
+- Create a dir structure like this:
+```
+- <username>@<ip>:~ $ tree -L 3
+.
+└── docker
+    └── homeAssistant
+        └── docker-compose.yml
+```
+(run: `mkdir docker && mkdir docker/homeAssistant && cd docker/homeAssistant && touch docker-compose.yml`)
+- edit the docker-compose using nano or vim (install vim beforehand using `sudo apt install vim`) and add the following content:
+
+```
+version: '3'
+services:
+  homeassistant:
+    image: "ghcr.io/home-assistant/home-assistant:stable"
+    container_name: homeassistant
+    network_mode: host
+    privileged: true
+    restart: unless-stopped
+    volumes:
+      - /home/pi/docker/homeAssistant/data:/config
+      - /etc/localtime:/etc/localtime:ro
+```
+- start docker in the background: run `docker compose up -d`
+- Access the home assistant on your local machine using the url `http://<PI-ip-adress>:8123`
+read more about it [here](https://www.home-assistant.io/installation/raspberrypi/#docker-compose)
+and [here](https://www.tim-kleyersburg.de/articles/home-assistant-with-docker-2023/)
+note that the second link suggests using another image but I opted for the official doc in this case 
+
+
+Optional stuff:
+
+install vim
+add aliases
+Add proper terminal setup
+
+Todos:
+- [ ] Add docker folder structure etc to this repo so this can get cloned
+- [ ] add GH ssh setup
