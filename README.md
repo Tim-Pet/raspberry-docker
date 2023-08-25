@@ -17,7 +17,7 @@ We want to achieve this without the usage of usb keyboard/mouse & external monit
 
 ### Software
 #### On the PI itself
-- Debian 11 (Bullseye) as OS on the PI
+- Debian 11 (Bullseye)
 - Docker
 
 #### On your machine
